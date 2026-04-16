@@ -1,0 +1,107 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(const MaterialApp(home: StudentManager()));
+
+// STEP 1: The Data Model (The "Object")
+class Student {
+  String name;
+  String rollNo;
+  Student({required this.name, required this.rollNo});
+}
+
+class StudentManager extends StatefulWidget {
+  const StudentManager({super.key});
+
+  @override
+  State<StudentManager> createState() => _StudentManagerState();
+}
+
+class _StudentManagerState extends State<StudentManager> {
+  // STEP 2: The Data Source (List)
+  final List<Student> _students = [];
+  
+  // Controllers to get text from Input Fields
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _rollController = TextEditingController();
+
+  // STEP 3: CRUD Logic - CREATE/UPDATE
+  void _addOrUpdateStudent({int? index}) {
+    // If index is null, we are ADDING. If it has a value, we are UPDATING.
+    if (index != null) {
+      _nameController.text = _students[index].name;
+      _rollController.text = _students[index].rollNo;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(index == null ? 'Add Student' : 'Update Student'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: _nameController, decoration: const InputDecoration(labelText: 'Name')),
+            TextField(controller: _rollController, decoration: const InputDecoration(labelText: 'Roll No')),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                if (index == null) {
+                  // CREATE
+                  _students.add(Student(name: _nameController.text, rollNo: _rollController.text));
+                } else {
+                  // UPDATE
+                  _students[index] = Student(name: _nameController.text, rollNo: _rollController.text);
+                }
+              });
+              _nameController.clear();
+              _rollController.clear();
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // STEP 3: CRUD Logic - DELETE
+  void _deleteStudent(int index) {
+    setState(() {
+      _students.removeAt(index);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Student Management')),
+      body: _students.isEmpty 
+        ? const Center(child: Text('No students added yet'))
+        : ListView.builder(
+            itemCount: _students.length,
+            itemBuilder: (context, index) {
+              return Card(
+                child: ListTile(
+                  title: Text(_students[index].name),
+                  subtitle: Text('Roll: ${_students[index].rollNo}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(icon: const Icon(Icons.edit), onPressed: () => _addOrUpdateStudent(index: index)),
+                      IconButton(icon: const Icon(Icons.delete, color: Colors.red), onPressed: () => _deleteStudent(index)),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _addOrUpdateStudent(),
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
