@@ -1,0 +1,112 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(const MaterialApp(home: EmployeeForm()));
+
+class Employee {
+  String id, name, designation;
+  double salary;
+
+  Employee(this.id, this.name, this.designation, this.salary);
+
+}
+
+List<Employee> emplist = [];
+
+class EmployeeForm extends StatefulWidget {
+  const EmployeeForm({super.key});
+  @override
+  State<EmployeeForm> createState() => _EmployeeFormState();
+}
+
+class _EmployeeFormState extends State<EmployeeForm> {
+  final idController = TextEditingController();
+  final nameController = TextEditingController();
+  final designationController = TextEditingController();
+  final salaryController = TextEditingController();
+
+  void _save() {
+    setState(() {
+      //using the short constructor here
+      emplist.add(Employee(
+          idController.text,
+          nameController.text,
+          designationController.text,
+          double.parse(salaryController.text)
+      ));
+    });
+    //optional clear fields if you have time in exam
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text( 'entry')),
+      body: Column(
+        children: [
+          TextField(controller: idController, decoration: const InputDecoration(labelText: 'ID')),
+          TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Name')),
+          TextField(controller: designationController, decoration: const InputDecoration(labelText: 'Designation')),
+          TextField(controller: salaryController, decoration: const InputDecoration(labelText: 'Salary')),
+          ElevatedButton(onPressed: _save, child: const Text('save')),
+          ElevatedButton(
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (c) => const CalPage())),
+              child: const Text('go to cal'),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class CalPage extends StatefulWidget {
+  const CalPage({super.key});
+  @override
+  State<CalPage> createState() => _CalPageState();
+}
+
+class _CalPageState extends State<CalPage> {
+  final search = TextEditingController();
+  String res = "";
+
+  void _calculate() {
+    for (var e in emplist) {
+      if (e.id == search.text) {
+        double b = e.salary;
+        double h, t;
+        //logic
+        if (b > 15000) {
+          h = b * 0.12;
+          t = b * 0.14;
+        }
+        else if (b >= 8000) {
+          h = b * 0.10;
+          t = b * 0.08;
+        }
+        else {
+          h = b * 0.07;
+          t = b * 0.07;
+        }
+
+        setState(() {
+          res = "Name: ${e.name} , Gross: ${b + h + t}";
+        });
+        return; // stop searching once found
+      }
+    }
+    setState(() { res = "not found";});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text( 'cal')),
+      body: Column(
+        children: [
+          TextField(controller: search, decoration: const InputDecoration(labelText: 'ID')),
+          ElevatedButton(onPressed: _calculate, child: const Text('calculate')),
+          Text(res)
+        ],
+      ),
+    );
+  }
+}
