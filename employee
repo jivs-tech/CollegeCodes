@@ -1,0 +1,162 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(const MaterialApp(home: EmployeeForm()));
+
+// --- SECTION 1: THE DATA MODEL ---
+// Simple class to store employee details.
+class Employee {
+  String id, name, designation;
+  double basicSalary;
+
+  Employee({
+    required this.id,
+    required this.name,
+    required this.designation,
+    required this.basicSalary,
+  });
+}
+
+// Global list: To keep it easy for the exam, we store data here.
+List<Employee> employeeList = [];
+
+// --- SECTION 2: SCREEN 1 - ENTRY FORM ---
+class EmployeeForm extends StatefulWidget {
+  const EmployeeForm({super.key});
+
+  @override
+  State<EmployeeForm> createState() => _EmployeeFormState();
+}
+
+class _EmployeeFormState extends State<EmployeeForm> {
+  // Controllers capture text from TextField
+  final idController = TextEditingController();
+  final nameController = TextEditingController();
+  final desController = TextEditingController();
+  final salaryController = TextEditingController();
+
+  void _saveEmployee() {
+    setState(() {
+      // Create new employee object and add to list
+      employeeList.add(Employee(
+        id: idController.text,
+        name: nameController.text,
+        designation: desController.text,
+        basicSalary: double.parse(salaryController.text),
+      ));
+    });
+    // Clear fields so the next entry is clean
+    idController.clear();
+    nameController.clear();
+    desController.clear();
+    salaryController.clear();
+    
+    // Show a little message
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Employee Saved!')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Employee Entry')),
+      drawer: Drawer( // Request 2: Sidebar
+        child: ListView(
+          children: [
+            const DrawerHeader(child: Text('Menu')),
+            ListTile(
+              title: const Text('Calculation Page'),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (ctx) => const SalaryPage())),
+            ),
+          ],
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(controller: idController, decoration: const InputDecoration(labelText: 'ID')),
+            TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Name')),
+            TextField(controller: desController, decoration: const InputDecoration(labelText: 'Designation')),
+            TextField(controller: salaryController, decoration: const InputDecoration(labelText: 'Salary'), keyboardType: TextInputType.number),
+            ElevatedButton(onPressed: _saveEmployee, child: const Text('Save')),
+            ElevatedButton(
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (ctx) => const SalaryPage())),
+              child: const Text('Calculate Salary Page'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// --- SECTION 3: SCREEN 2 - CALCULATION ---
+class SalaryPage extends StatefulWidget {
+  const SalaryPage({super.key});
+
+  @override
+  State<SalaryPage> createState() => _SalaryPageState();
+}
+
+class _SalaryPageState extends State<SalaryPage> {
+  final searchController = TextEditingController();
+  String result = "Search by ID";
+
+  void _calculate() {
+    String searchId = searchController.text;
+    Employee? foundEmp;
+
+    // Loop through list to find the ID
+    for (var e in employeeList) {
+      if (e.id == searchId) {
+        foundEmp = e;
+        break;
+      }
+    }
+
+    if (foundEmp != null) {
+      double basic = foundEmp.basicSalary;
+      double hra, ta;
+
+      // --- THE EXAM LOGIC (IF-ELSE) ---
+      if (basic > 15000) {
+        hra = basic * 0.12;
+        ta = basic * 0.14;
+      } else if (basic >= 8000) {
+        hra = basic * 0.10;
+        ta = basic * 0.08;
+      } else {
+        hra = basic * 0.07;
+        ta = basic * 0.07;
+      }
+
+      double gross = basic + hra + ta;
+      setState(() {
+        result = "Employee: ${foundEmp!.name}\nGross Salary: $gross";
+      });
+    } else {
+      setState(() {
+        result = "Not Found!";
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Calculator')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(controller: searchController, decoration: const InputDecoration(labelText: 'Enter ID')),
+            ElevatedButton(onPressed: _calculate, child: const Text('Calculate')),
+            const SizedBox(height: 20),
+            Text(result, style: const TextStyle(fontSize: 20)),
+          ],
+        ),
+      ),
+    );
+  }
+}
