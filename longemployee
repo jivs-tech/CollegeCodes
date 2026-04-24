@@ -1,0 +1,331 @@
+import 'package:flutter/material.dart';
+
+// void main() is the entry point of the app.
+// runApp() starts the Flutter application.
+// MaterialApp is the root widget that provides themes and navigation.
+void main() => runApp(const MaterialApp(
+      home: LoginScreen(), // First screen to show
+      debugShowCheckedModeBanner: false, // Removes the red debug tag
+    ));
+
+// --- 1. DATA MODEL (Blueprint) ---
+// We create a class to define what an 'Employee' object looks like.
+class Employee {
+  String id, name, des, date;
+  double salary;
+
+  // Constructor: Used to create an instance of this class.
+  // We use positional parameters (no curly braces) for easier exam writing.
+  Employee(this.id, this.name, this.des, this.salary, this.date);
+}
+
+// Global List: Stores all employee objects created during the app session.
+List<Employee> empList = [];
+
+// --- 2. LOGIN SCREEN (Stateful because it handles user input) ---
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key}); // super.key passes the widget ID to the parent
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  // TextEditingControllers: Used to 'spy' on and grab text from TextFields.
+  final userC = TextEditingController();
+  final passC = TextEditingController();
+
+  // Function to validate login logic.
+  void login() {
+    // Basic if-else validation.
+    if (userC.text == "admin" && passC.text == "123") {
+      // Navigator.pushReplacement moves to the next screen and REMOVES the login screen from history.
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (c) => const HomePage()));
+    } else {
+      // ScaffoldMessenger shows a small popup (SnackBar) at the bottom.
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Login Failed")));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Scaffold: The basic layout structure (Appbar + Body).
+    return Scaffold(
+      appBar: AppBar(title: const Text("Login Screen")),
+      body: Padding(
+        padding: const EdgeInsets.all(20), // Adds space around the contents
+        child: Column(
+          children: [
+            // TextField: Where the user types information.
+            TextField(
+                controller: userC,
+                decoration: const InputDecoration(labelText: "Username")),
+            TextField(
+                controller: passC,
+                decoration: const InputDecoration(labelText: "Password"),
+                obscureText: true), // Hides the password characters
+            const SizedBox(height: 20), // Adds vertical space
+            ElevatedButton(
+                onPressed: login,
+                child: const Text("Login")), // Triggers login function
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// --- 3. HOME PAGE (With Drawer and Bottom Navigation Bar) ---
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0; // Tracks which tab is selected in BottomBar
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Employee Portal")),
+      
+      // DRAWER: The sidebar menu.
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            // Header at the top of the drawer.
+            const DrawerHeader(
+                decoration: BoxDecoration(color: Colors.blue),
+                child: Text("Menu",
+                    style: TextStyle(color: Colors.white, fontSize: 24))),
+            // ListTile: Clickable rows in the drawer.
+            ListTile(
+                leading: const Icon(Icons.add),
+                title: const Text("Add Employee"),
+                onTap: () => Navigator.push(
+                    context, MaterialPageRoute(builder: (c) => const AddPage()))),
+            ListTile(
+                leading: const Icon(Icons.list),
+                title: const Text("View List"),
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (c) => const ViewPage()))),
+            ListTile(
+                leading: const Icon(Icons.calculate),
+                title: const Text("Salary Calculator"),
+                onTap: () => Navigator.push(
+                    context, MaterialPageRoute(builder: (c) => const CalPage()))),
+          ],
+        ),
+      ),
+
+      // BOTTOM NAVIGATION BAR: Bar at the bottom of the screen.
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex, // Highlights the current icon
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index; // Updates the UI when a tab is clicked
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
+        ],
+      ),
+
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.business, size: 100, color: Colors.blue),
+            Text("Welcome to Section $_currentIndex",
+                style: const TextStyle(fontSize: 20)),
+            const Text("Open the sidebar to manage data!"),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// --- 4. ADD EMPLOYEE PAGE (Handling Data Entry & DatePicker) ---
+class AddPage extends StatefulWidget {
+  const AddPage({super.key});
+  @override
+  State<AddPage> createState() => _AddPageState();
+}
+
+class _AddPageState extends State<AddPage> {
+  final idC = TextEditingController();
+  final nameC = TextEditingController();
+  final desC = TextEditingController();
+  final salC = TextEditingController();
+  String selectedDate = "Not Selected";
+
+  // ASYNC Function: Used for the DatePicker because we must WAIT for user input.
+  void _showDate() async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000), // Earliest year allowed
+      lastDate: DateTime(2100), // Latest year allowed
+    );
+    // If user didn't cancel, update the selected date.
+    if (picked != null) {
+      setState(() {
+        selectedDate = picked.toString().split(' ')[0]; // Formats to YYYY-MM-DD
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("New Employee Record")),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          TextField(
+              controller: idC, decoration: const InputDecoration(labelText: "ID")),
+          TextField(
+              controller: nameC,
+              decoration: const InputDecoration(labelText: "Full Name")),
+          TextField(
+              controller: desC,
+              decoration: const InputDecoration(labelText: "Designation")),
+          TextField(
+              controller: salC,
+              decoration: const InputDecoration(labelText: "Basic Salary"),
+              keyboardType: TextInputType.number), // Shows number keypad
+          
+          const SizedBox(height: 10),
+          
+          // Row for Date Selection
+          Row(
+            children: [
+              Text("Join Date: $selectedDate"),
+              IconButton(
+                  onPressed: _showDate, icon: const Icon(Icons.calendar_today)),
+            ],
+          ),
+          
+          const SizedBox(height: 20),
+          
+          ElevatedButton(
+              onPressed: () {
+                // setState() tells Flutter to refresh the UI with new data.
+                setState(() {
+                  empList.add(Employee(
+                      idC.text,
+                      nameC.text,
+                      desC.text,
+                      double.parse(salC.text), // Converts String text to Double
+                      selectedDate));
+                });
+                Navigator.pop(context); // Goes back to the previous screen
+              },
+              child: const Text("Save Employee Data")),
+        ],
+      ),
+    );
+  }
+}
+
+// --- 5. VIEW PAGE (Displaying Data in a List) ---
+class ViewPage extends StatelessWidget {
+  const ViewPage({super.key});
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Employee Registry")),
+      // ListView.builder: Efficiently creates a list of items based on the data list.
+      body: ListView.builder(
+        itemCount: empList.length, // Total number of items in our global list
+        itemBuilder: (c, i) => Card( // Card adds a nice shadow/border
+          child: ListTile(
+            leading: const Icon(Icons.person),
+            title: Text(empList[i].name), // Accessing data by index 'i'
+            subtitle: Text("ID: ${empList[i].id} | Joined: ${empList[i].date}"),
+            trailing: Text("₹${empList[i].salary}"),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// --- 6. SALARY CALCULATION PAGE (Logic Practice) ---
+class CalPage extends StatefulWidget {
+  const CalPage({super.key});
+  @override
+  State<CalPage> createState() => _CalPageState();
+}
+
+class _CalPageState extends State<CalPage> {
+  final search = TextEditingController();
+  String res = "Enter Employee ID to calculate";
+
+  void _calculate() {
+    // SEARCH Logic: Loop through the global list.
+    for (var e in empList) {
+      if (e.id == search.text) {
+        double b = e.salary;
+        double h, t;
+
+        // IF-ELSE Logic: Based on the syllabus requirements.
+        if (b > 15000) {
+          h = b * 0.12; // HRA 12%
+          t = b * 0.14; // TA 14%
+        } else if (b >= 8000) {
+          h = b * 0.10; // HRA 10%
+          t = b * 0.08; // TA 8%
+        } else {
+          h = b * 0.07; // HRA 7%
+          t = b * 0.07; // TA 7%
+        }
+
+        double gross = b + h + t;
+
+        // Update the 'res' string inside setState to show the math result.
+        setState(() {
+          res = "Employee: ${e.name}\nGross Salary: ₹$gross";
+        });
+        return; // Exit the loop and function once found
+      }
+    }
+    // If loop finishes without finding the ID.
+    setState(() {
+      res = "Employee ID not found!";
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Salary Calculator")),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            TextField(
+                controller: search,
+                decoration: const InputDecoration(labelText: "Search by ID")),
+            const SizedBox(height: 10),
+            ElevatedButton(
+                onPressed: _calculate, child: const Text("Calculate Salary")),
+            const SizedBox(height: 30),
+            // Text widget displaying the 'res' string.
+            Text(res,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+    );
+  }
+}
