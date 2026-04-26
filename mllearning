@@ -1,0 +1,71 @@
+# IMPORTS (Normal) 
+import numpy as np 
+import pandas as pd 
+# Imputer
+from sklearn.impute import KNNImputer
+# Standardization 
+from sklearn.preprocessing import StandardScaler 
+from sklearn.preprocessing import MinMaxScaler 
+from sklearn.preprocessing import LabelEncoder 
+# Clustering 
+from sklearn.cluster import KMeans, KMedoids, AgglomerativeClustering 
+# Data Split from sklearn.model_selection 
+import train_test_split 
+# Regressions 
+from sklearn.linear_model 
+import LinearRegression, LogisticRegression 
+from sklearn.tree import DecisionTreeRegressor 
+from sklearn.ensemble import RandomForestRegressor 
+from sklearn.neighbors import KNeighborsRegressor 
+# Classification from sklearn.svm import SVC 
+from sklearn.naive_bayes import GaussianNB 
+from sklearn.tree import DecisionTreeClassifier 
+from sklearn.neighbors import KNeighborsClassifier 
+# Evaultion 
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, confusion_matrix, accuracy_score, precision_score, recall_score, f1_score 
+# Bagging 
+from sklearn.ensemble import BaggingClassifier 
+from sklearn.ensemble import BaggingRegressor 
+# Boosting 
+from sklearn.ensemble import AdaBoostClassifier from sklearn.ensemble import AdaBoostRegressor 
+from sklearn.ensemble import GradientBoostingClassifier from sklearn.ensemble import GradientBoostingRegressor 
+from xgboost import XGBClassifier 
+from xgboost import XGBRegressor 
+# Stacking 
+from sklearn.ensemble import StackingClassifier 
+from sklearn.ensemble import StackingRegressor
+# Voting Regressor 
+from sklearn.ensemble import VotingRegressor 
+df = pd.read_csv(“path”) 
+# Read CSV file df = pd.to_csv(“path”) 
+# Write CSV file df.head() or df.head(n) # Print first 5 or N rows from data df.tail() or df.tail(n) 
+# Print last 5 or N rows from data df.shape() 
+# Tuple (n, m) where N = rows, M = columns df.size 
+# Print number of rows * columns df.dtypes 
+# Print datatype of each cokumn df.describe() 
+# Stts summary of data df.info() 
+# Prints non-null count along with data type df.isna() 
+# Prints data of columns and tells us if they contain np.nan or not df['col_name'] = df['col_name'].fillna('val') 
+# Fills missing value in col_name with 'val' df['col_name'] = df['col_name'].ffill() 
+# Fills missing value in col_name using forward fill df['col_name'] = df['col_name'].bfill() 
+# Fills missing value in col_name using backward fill df.isnull().sum() 
+# Print amount of rows missing data in each column df.isnull().values.any() 
+# Checks if dataframe contains missing values or not df.duplicated().sum() 
+# Print amount of rows having duplicates in each column col_list = df.select_dtypes(include=np.number).columns.tolist() 
+# Prints columns with numerical data type df['ColumnName'].mean() # Print mean df['ColumnName'].median() # Print median df['ColumnName'].mode() 
+# Print modedf.rename(columns={'OLD_COL_1': 'NEW_COL_1', 'OLD_COL_2': 'NEW_COL_2', ...}, , inplace=True) # Rename columns df.drop(m/'ColumnName', axis=n)
+# Remove specific row (m) or column (axis = 0 [row] (default), axis = 1 [column]) df.dropna(m/'ColumnName', axis=n) 
+# Remove specific null-value row (m) or column (axis = 0 [row] (default), axis = 1 [column]) df.drop_duplicates() 
+# Drops duplicate rows del df['col_name'] # Drops that columns df[['ColumnName1', 'ColumnName2', ...]] 
+# Print those columns df['col_name'] = [] # Adds new column (manual data entry) df['col_name'] = ((df['col_1'] + df['col_2']) / 2) 
+# Adds new column (auto data entry) (Example of average) df['col_name'] = 'value' # Adds a new column with each row having same 'value' 
+# Add new col_name where values are either 'val_1' or 'val_2' depending on value of old_col_name and condition df['col_name'] = np.where(data['old_col_name'] <condition> <value> , 'val_1', 'val_2') df.insert(col_num, 'col_name', [data]) 
+# Inserts a new column at index col_num 
+# Insert multiple columns in the dataset df.assign( 'col_name_1': [data1], 'col_name_2': [data2], ... ) df['col_name'].unique() 
+# Print unique values from the column 'col_name' df['col_name'].nunique() # Print number of unique values from the column 'col_name' df['col_name'].min() 
+# Print minimum value from the column 'col_name' df['col_name'].max() # Print maximum value from the column 'col_name' data['col_name'].value_counts() 
+# Prints how many rows belongs to each unique value in the 'col_namedata.groupby('col_name')['col_name_1'].min() 
+# Print minimum value of 'col_name_1' for each unique value in 'col_name' data = data.sort_values(by='col_name', ascending=True) 
+# Sort rows values of 'col_name data['col_name'] = data['col_name'].replace('old_val',,'new_val') 
+# Replace a old_val to new_val in 'col_name' data['col_name'] = data['col_name'].replace({'old_val': 'new_val', 'old_val_2': 'new_val_2', ..}) 
+# Replace multiple values df[(df['col_name'] <condition> <value>) <condition> (df['col_name_2'] <condition> <value>)]
