@@ -1,0 +1,22 @@
+#AUTOENCODER 
+import tensorflow as tf 
+from tensorflow.keras.models import Model 
+from tensorflow.keras.layers import Input, Dense 
+#training data 
+X = tf.constant([[1., 0., 0., 0.]]) 
+#input 
+layer input_layer = Input(shape=(4,)) 
+#encoder 
+encoded_output = Dense(2, activation='relu')(input_layer) 
+#decoder
+decoded = Dense(4, activation='sigmoid')(encoded_output) 
+#autodecoder 
+autoencoder = Model(input_layer, decoded) autoencoder.compile(optimizer='adam', loss='mse') 
+#train 
+autoencoder.fit(X, X, epochs=500, verbose=0) 
+#predict 
+output = autoencoder.predict(X) 
+print("Input:") 
+print(X.numpy()) 
+print("reconstructed output:") 
+print(output)
