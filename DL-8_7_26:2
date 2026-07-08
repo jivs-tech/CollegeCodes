@@ -1,0 +1,32 @@
+#AUTOENCODER WITH HIDDEN LAYERS 
+import tensorflow as tf 
+from tensorflow.keras.models 
+import Model from tensorflow.keras.layers 
+import Input, Dense 
+# 1. Training data
+X = tf.constant([[1., 0., 0., 0.]]) 
+# 2. Input layer (4 dimensions) 
+input_layer = Input(shape=(4,))
+# 3. ENCODER (with 2 hidden layers of 8 neurons) 
+enc_hidden1 = Dense(8, activation='relu')(input_layer) 
+enc_hidden2 = Dense(8, activation='relu')(enc_hidden1) 
+encoded_output = Dense(2, activation='relu')(enc_hidden2) 
+# Bottleneck layer
+(2 dimensions) 
+# 4. DECODER 
+(with 2 hidden layers of 8 neurons) 
+dec_hidden1 = Dense(8, activation='relu')(encoded_output) 
+dec_hidden2 = Dense(8, activation='relu')(dec_hidden1) 
+decoded = Dense(4, activation='sigmoid')(dec_hidden2)
+# Reconstruction layer (4 dimensions) 
+# 5. Build and compile the Deep Autoencoder 
+autoencoder = Model(input_layer, decoded) 
+autoencoder.compile(optimizer='adam', loss='mse')
+# 6. Train the model 
+autoencoder.fit(X, X, epochs=500, verbose=0)
+# 7. Predict and check reconstruction 
+output = autoencoder.predict(X) 
+print("Input:") 
+print(X.numpy()) 
+print("\nReconstructed output:") 
+print(output)
