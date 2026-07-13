@@ -1,0 +1,22 @@
+N GRAMS
+from nltk.tokenize import word_tokenize 
+from nltk import download
+download('punkt')
+download('punkt_tab') 
+text = "Machine learning is very interesting"
+tokens = word_tokenize(text.lower())
+print("Tokens:") 
+print(tokens) 
+print("\nUnigrams")
+for word in tokens: 
+print(word) 
+*********************
+from nltk import bigrams
+from nltk.tokenize import word_tokenize
+from nltk import download download('punkt') 
+download('punkt_tab')
+text = "Machine learning is very interesting" 
+tokens = word_tokenize(text.lower())
+print("Bigrams")
+for bg in bigrams(tokens):
+print(bg)
