@@ -1,0 +1,12 @@
+SpaCy: """ import spacy: Imports the spaCy NLP library. spacy.load('en_core_web_sm'):
+Loads the small English language model. 
+This model helps Python understand and process English text. """
+import spacy nlp = spacy.load('en_core_web_sm') 
+# Store text in a variable sample_text = """ A well-structured paragraph in English typically contains ... """ 
+# Print the text print(sample_text) """ The text is converted into a spaCy document object. Now spaCy can: split sentences split words identify grammar identify nouns/verbs/etc. """
+doc = nlp(sample_text) 
+print("Sentence Tokenization:") 
+for sent in doc.sents: print("-", sent.text)
+print("Word Tokenization:")
+for token in doc: print(token.text) 
+#Splits the file content into words.
